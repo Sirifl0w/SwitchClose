@@ -9,3 +9,5 @@ SwitchClose automatically dismisses the app switcher when the last app is killed
 
 - Idea: 
 - Settings icon: @ELGTweaks7
+
+Simple toggle implementation as suggested here - http://sharedinstance.net/2014/04/settings-root-toggles
