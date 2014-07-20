@@ -14,13 +14,15 @@
 {}
 @property(readonly, nonatomic) NSArray *applicationList;
 - (void)_quitAppAtIndex:(unsigned int)arg1;
+
+// custom methods
+- (void)_dismissAppSwitcher;
 @end
 
 @interface SBUIController : NSObject
-
+{}
 + (id)sharedInstance;
 - (void)dismissSwitcherAnimated:(BOOL)arg1;
-
 @end
 
 static BOOL SCEnabled = YES;
@@ -39,18 +41,16 @@ static BOOL SCEnabled = YES;
 %new
 
 - (void)_dismissAppSwitcher {
-
-[[%c(SBUIController) sharedInstance] dismissSwitcherAnimated:YES];
-
+	[[%c(SBUIController) sharedInstance] dismissSwitcherAnimated:YES];
 }
 
 %end
 
 static void loadPrefs() {
 
-NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:SWITCHCLOSE_PREFS];
-SCEnabled = [prefs objectForKey:@"SC_Enabled"] == nil ? YES : [[prefs objectForKey:@"SC_Enabled"] boolValue];
-[prefs release];
+	NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:SWITCHCLOSE_PREFS];
+	SCEnabled = [prefs objectForKey:@"SC_Enabled"] == nil ? YES : [[prefs objectForKey:@"SC_Enabled"] boolValue];
+	[prefs release];
 
 }
 
