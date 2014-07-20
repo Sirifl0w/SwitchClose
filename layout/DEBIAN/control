@@ -1,0 +1,9 @@
+Package: com.sirifl0w.switchclose
+Name: SwitchClose
+Depends: mobilesubstrate, firmware (>= 7.0), preferenceloader
+Version: 1.0
+Architecture: iphoneos-arm
+Description: Auto dismiss the iOS 7 app switcher.
+Maintainer: Sirifl0w <sirifl0w@gmail.com>
+Author: Sirifl0w <sirifl0w@gmail.com>
+Section: Tweaks
