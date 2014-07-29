@@ -9,9 +9,9 @@
 #import <UIKit/UIKit.h>
 
 #define SWITCHCLOSE_PREFS @"var/mobile/Library/Preferences/com.sirifl0w.switchclose.plist"
+#define REDUCEMOTION_PREFS @"var/mobile/Library/Preferences/com.apple.Accessibility.plist"
 
-@interface SBAppSliderController : UIViewController 
-{}
+@interface SBAppSliderController
 @property(readonly, nonatomic) NSArray *applicationList;
 - (void)_quitAppAtIndex:(unsigned int)arg1;
 
@@ -19,22 +19,41 @@
 - (void)_dismissAppSwitcher;
 @end
 
-@interface SBUIController : NSObject
-{}
+@interface SBUIController
 + (id)sharedInstance;
 - (void)dismissSwitcherAnimated:(BOOL)arg1;
 @end
 
 static BOOL SCEnabled = YES;
+static BOOL RMEnabled = nil;
+static NSDictionary *SCPrefs;
+static NSDictionary *RMPrefs;
+
+static void loadPrefs() {
+
+	SCPrefs = [[NSDictionary alloc] initWithContentsOfFile:SWITCHCLOSE_PREFS];
+	SCEnabled = [SCPrefs objectForKey:@"SC_Enabled"] == nil ? YES : [[SCPrefs objectForKey:@"SC_Enabled"] boolValue];
+	[SCPrefs release];
+
+	RMPrefs = [[NSDictionary alloc] initWithContentsOfFile:REDUCEMOTION_PREFS];
+	RMEnabled = [RMPrefs objectForKey:@"ReduceMotionEnabled"] == nil ? YES : [[RMPrefs objectForKey:@"ReduceMotionEnabled"] boolValue];
+	[RMPrefs release];
+
+}
 
 %hook SBAppSliderController
 
 - (void)_quitAppAtIndex:(unsigned int)arg1 {
 
 	%orig();
+	loadPrefs();
 
 	if (([[self applicationList] count] == 1) && SCEnabled) {
-		[NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(_dismissAppSwitcher) userInfo:nil repeats:NO];
+		if (RMEnabled) {
+			[NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(_dismissAppSwitcher) userInfo:nil repeats:NO];
+		} else {
+			[NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(_dismissAppSwitcher) userInfo:nil repeats:NO];
+		}
 	}
 }
 
@@ -45,14 +64,6 @@ static BOOL SCEnabled = YES;
 }
 
 %end
-
-static void loadPrefs() {
-
-	NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:SWITCHCLOSE_PREFS];
-	SCEnabled = [prefs objectForKey:@"SC_Enabled"] == nil ? YES : [[prefs objectForKey:@"SC_Enabled"] boolValue];
-	[prefs release];
-
-}
 
 %ctor {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
