@@ -11,10 +11,8 @@
 #define SWITCHCLOSE_PREFS @"var/mobile/Library/Preferences/com.sirifl0w.switchclose.plist"
 #define REDUCEMOTION_PREFS @"var/mobile/Library/Preferences/com.apple.Accessibility.plist"
 
-@interface SBAppSliderController
-@property(readonly, nonatomic) NSArray *applicationList;
-- (void)_quitAppAtIndex:(unsigned int)arg1;
-
+@interface SBAppSwitcherController
+-(void)_quitAppWithDisplayItem:(id)arg1;
 // custom methods
 - (void)_dismissAppSwitcher;
 @end
@@ -41,14 +39,17 @@ static void loadPrefs() {
 
 }
 
-%hook SBAppSliderController
+%hook SBAppSwitcherController
 
-- (void)_quitAppAtIndex:(unsigned int)arg1 {
+-(void)_quitAppWithDisplayItem:(id)arg1 {
 
 	%orig();
 	loadPrefs();
 
-	if (([[self applicationList] count] == 1) && SCEnabled) {
+	NSMutableArray *appList = MSHookIvar<NSMutableArray *>(self, "_appList_use_block_accessor");
+	NSUInteger appCount = appList.count;
+
+	if ((appCount == 1) && SCEnabled) {
 		if (RMEnabled) {
 			[NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(_dismissAppSwitcher) userInfo:nil repeats:NO];
 		} else {
@@ -58,11 +59,9 @@ static void loadPrefs() {
 }
 
 %new
-
 - (void)_dismissAppSwitcher {
 	[[%c(SBUIController) sharedInstance] dismissSwitcherAnimated:YES];
 }
-
 %end
 
 %ctor {
